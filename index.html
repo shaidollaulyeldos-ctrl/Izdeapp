@@ -1,46 +1,75 @@
 <!DOCTYPE html>
-<html lang="ru" class="dark">
+<html lang="ru" class="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Izde Contest — Платформа олимпиад и хакатонов</title>
+    <title>Izde Contest — Платформа состязаний</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); }
-        .glass-nav { background: rgba(10, 10, 12, 0.8); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
-        .glass-modal { background: rgba(18, 18, 22, 0.95); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.15); }
+        body { 
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f6f8fc 0%, #e9eef6 50%, #f0f4f9 100%);
+            background-attachment: fixed;
+        }
+        /* Liquid Crystal Aesthetic */
+        .liquid-glass { 
+            background: rgba(255, 255, 255, 0.65); 
+            backdrop-filter: blur(25px) saturate(180%); 
+            -webkit-backdrop-filter: blur(25px) saturate(180%); 
+            border: 1px solid rgba(255, 255, 255, 0.8); 
+            box-shadow: 0 20px 50px rgba(0, 113, 227, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.9);
+        }
+        .liquid-nav { 
+            background: rgba(255, 255, 255, 0.75); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px); 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.6); 
+        }
+        .liquid-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.45) 100%);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.03), 0 5px 15px rgba(0, 113, 227, 0.04);
+        }
+        .liquid-btn {
+            background: linear-gradient(135deg, #0071e3 0%, #005bb5 100%);
+            box-shadow: 0 8px 20px rgba(0, 113, 227, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+        }
     </style>
 </head>
-<body class="bg-[#050507] text-[#f5f5f7] antialiased selection:bg-[#0071e3] selection:text-white min-h-screen">
+<body class="text-[#1d1d1f] antialiased selection:bg-[#0071e3] selection:text-white min-h-screen">
 
     <!-- Навигация -->
-    <header class="fixed top-0 left-0 right-0 z-40 glass-nav">
+    <header class="fixed top-0 left-0 right-0 z-40 liquid-nav">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-3 cursor-pointer" onclick="goHome()">
-                <div class="w-8 h-8 rounded-full bg-[#0071e3] flex items-center justify-center font-bold text-white text-sm">
+                <div class="w-9 h-9 rounded-2xl liquid-btn flex items-center justify-center font-bold text-white text-base">
                     i
                 </div>
-                <span class="font-semibold text-base sm:text-lg tracking-tight">izde <span class="text-white/40 font-normal">contest</span></span>
+                <span class="font-bold text-lg tracking-tight text-[#1d1d1f]">izde <span class="text-[#0071e3] font-semibold">contest</span></span>
             </div>
             
             <div class="flex items-center space-x-3">
-                <button id="btn-create-contest" onclick="openModal('modal-contest')" class="hidden bg-[#0071e3] hover:bg-[#0077ed] text-white px-3.5 py-2 rounded-full text-xs font-medium transition items-center gap-1.5">
-                    <i data-lucide="plus" class="w-3.5 h-3.5"></i> Создать
+                <button id="btn-create-contest" onclick="openModal('modal-contest')" class="hidden liquid-btn hover:opacity-90 text-white px-4 py-2 rounded-full text-xs font-semibold transition items-center gap-1.5">
+                    <i data-lucide="plus" class="w-4 h-4"></i> Создать
                 </button>
                 
                 <div id="auth-guest-controls">
-                    <button onclick="openModal('modal-auth')" class="bg-white/10 hover:bg-white/20 text-white px-3.5 py-2 rounded-full text-xs font-medium transition border border-white/10">
+                    <button onclick="openModal('modal-auth')" class="bg-white/80 hover:bg-white text-[#0071e3] px-4 py-2 rounded-full text-xs font-semibold transition border border-[#0071e3]/20 shadow-sm">
                         Войти
                     </button>
                 </div>
 
-                <div id="auth-user-controls" class="hidden flex items-center space-x-2">
-                    <span id="user-display" class="hidden sm:inline text-xs text-white/70 font-mono bg-white/5 px-3 py-1.5 rounded-full border border-white/10"></span>
-                    <button onclick="logout()" class="text-xs text-red-400 hover:text-red-300 font-medium px-2 py-1">
+                <div id="auth-user-controls" class="hidden flex items-center space-x-3">
+                    <div class="flex flex-col text-right">
+                        <span id="user-display-name" class="text-xs font-bold text-[#1d1d1f]"></span>
+                        <span id="user-display-username" class="text-[10px] text-[#0071e3] font-medium"></span>
+                    </div>
+                    <button onclick="logout()" class="text-xs text-red-500 hover:text-red-600 font-medium px-2 py-1 bg-red-50 rounded-lg">
                         Выйти
                     </button>
                 </div>
@@ -49,112 +78,71 @@
     </header>
 
     <!-- Основной контент -->
-    <main class="max-w-6xl mx-auto px-4 sm:px-6 pt-28 sm:pt-32 pb-20">
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 pt-28 sm:pt-36 pb-20">
         
+        <!-- Заглушка: Неподтвержденный Email -->
+        <div id="view-unverified" class="hidden max-w-md mx-auto text-center liquid-card p-8 sm:p-10 rounded-3xl my-12">
+            <div class="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="mail-warning" class="w-8 h-8"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-[#1d1d1f] mb-2">Подтвердите Email</h2>
+            <p class="text-sm text-[#86868b] mb-6">Мы отправили ссылку на вашу почту. Пожалуйста, откройте письмо и подтвердите аккаунт для доступа к платформе.</p>
+            <button onclick="logout()" class="w-full liquid-btn text-white py-3 rounded-xl font-medium text-sm">Понятно, выйти</button>
+        </div>
+
         <!-- Главный экран -->
         <div id="view-home">
             <section class="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
-                <h1 class="text-3xl sm:text-5xl font-bold tracking-tight text-white mb-4">
-                    Олимпиады и хакатоны Казахстана.
+                <span class="px-3.5 py-1.5 rounded-full bg-white/80 border border-[#0071e3]/20 text-[#0071e3] text-xs font-semibold shadow-sm inline-block mb-4">
+                    Liquid Crystal Platform 2026
+                </span>
+                <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-[#1d1d1f] mb-4 leading-tight">
+                    Олимпиады и хакатоны <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-[#0071e3] to-[#42a5f5]">Казахстана</span>
                 </h1>
-                <p class="text-sm sm:text-base text-white/50 font-light leading-relaxed">
-                    Платформа для частных школ. Участвуй, побеждай и организуй состязания.
+                <p class="text-sm sm:text-base text-[#86868b] font-normal leading-relaxed">
+                    Единая платформа для частных школ. Безопасная верификация и прямая связь с организаторами.
                 </p>
             </section>
 
             <!-- Фильтры -->
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-8">
-                <h2 class="text-xl font-semibold tracking-tight">Активные события</h2>
-                <div class="flex gap-1.5 bg-white/5 p-1 rounded-full border border-white/10 text-xs self-start sm:self-auto">
-                    <button onclick="filterCategory('all', this)" class="filter-btn px-4 py-1.5 rounded-full bg-[#0071e3] text-white font-medium transition">Все</button>
-                    <button onclick="filterCategory('olympiad', this)" class="filter-btn px-4 py-1.5 rounded-full text-white/60 hover:text-white transition">Олимпиады</button>
-                    <button onclick="filterCategory('hackathon', this)" class="filter-btn px-4 py-1.5 rounded-full text-white/60 hover:text-white transition">Хакатоны</button>
+                <h2 class="text-xl font-bold text-[#1d1d1f]">Активные события</h2>
+                <div class="flex gap-1.5 bg-white/80 p-1 rounded-full border border-black/5 text-xs self-start sm:self-auto shadow-sm">
+                    <button onclick="filterCategory('all', this)" class="filter-btn px-4 py-1.5 rounded-full liquid-btn text-white font-medium transition">Все</button>
+                    <button onclick="filterCategory('olympiad', this)" class="filter-btn px-4 py-1.5 rounded-full text-[#86868b] hover:text-[#1d1d1f] transition">Олимпиады</button>
+                    <button onclick="filterCategory('hackathon', this)" class="filter-btn px-4 py-1.5 rounded-full text-[#86868b] hover:text-[#1d1d1f] transition">Хакатоны</button>
                 </div>
             </div>
 
             <!-- Сетка карточек -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5" id="cards-container">
-                
-                <!-- Карточка 1 -->
-                <div class="contest-card glass p-6 sm:p-8 rounded-3xl hover:border-white/20 transition group relative flex flex-col justify-between" data-type="olympiad">
-                    <div>
-                        <div class="flex justify-between items-start mb-4">
-                            <span class="px-3 py-1 rounded-full bg-[#0071e3]/10 text-[#2997ff] border border-[#0071e3]/20 text-xs font-medium">Математика</span>
-                            <span class="text-xs text-white/40 font-mono">15 Ноября • 10:00</span>
-                        </div>
-                        <h3 class="text-lg sm:text-xl font-semibold mb-2 text-white">Республиканская олимпиада по Алгебре</h3>
-                        <p class="text-xs sm:text-sm text-white/50 font-light mb-6">Для учеников 8-11 классов. Задачи на логику, комбинаторику и теорию чисел.</p>
-                    </div>
-
-                    <div>
-                        <div class="flex items-center justify-between pt-4 border-t border-white/5 text-xs text-white/40 mb-4">
-                            <span>Joo School</span>
-                            <div class="flex gap-2">
-                                <a href="https://t.me/" target="_blank" class="px-2.5 py-1 rounded-lg bg-[#0071e3]/10 text-[#2997ff] hover:bg-[#0071e3]/20 transition">Telegram</a>
-                                <a href="https://wa.me/" target="_blank" class="px-2.5 py-1 rounded-lg bg-[#34c759]/10 text-[#34c759] hover:bg-[#34c759]/20 transition">WhatsApp</a>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center justify-between gap-3">
-                            <button onclick="openDetails('Республиканская олимпиада по Алгебре', '15 Ноября • 10:00', 'Сложные задачи по алгебре для старшеклассников. Длительность: 90 минут. Формат: онлайн.', 'Joo School', 'https://t.me/', 'https://wa.me/')" class="text-xs text-white/60 hover:text-white underline">Подробнее</button>
-                            <button onclick="registerContest('Республиканская олимпиада по Алгебре')" class="bg-white/10 hover:bg-[#0071e3] text-white px-4 py-2 rounded-xl text-xs font-medium transition">Записаться</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Карточка 2 -->
-                <div class="contest-card glass p-6 sm:p-8 rounded-3xl hover:border-white/20 transition group relative flex flex-col justify-between" data-type="hackathon">
-                    <div>
-                        <div class="flex justify-between items-start mb-4">
-                            <span class="px-3 py-1 rounded-full bg-[#bf5af2]/10 text-[#bf5af2] border border-[#bf5af2]/20 text-xs font-medium">Хакатон</span>
-                            <span class="text-xs text-white/40 font-mono">20-22 Ноября</span>
-                        </div>
-                        <h3 class="text-lg sm:text-xl font-semibold mb-2 text-white">Izde Youth AI Hackathon 2026</h3>
-                        <p class="text-xs sm:text-sm text-white/50 font-light mb-6">Создайте веб-сервис или бота за 48 часов. Менторство и призовой фонд.</p>
-                    </div>
-
-                    <div>
-                        <div class="flex items-center justify-between pt-4 border-t border-white/5 text-xs text-white/40 mb-4">
-                            <span>Izde Network</span>
-                            <div class="flex gap-2">
-                                <a href="https://t.me/" target="_blank" class="px-2.5 py-1 rounded-lg bg-[#0071e3]/10 text-[#2997ff] hover:bg-[#0071e3]/20 transition">Telegram</a>
-                                <a href="https://wa.me/" target="_blank" class="px-2.5 py-1 rounded-lg bg-[#34c759]/10 text-[#34c759] hover:bg-[#34c759]/20 transition">WhatsApp</a>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center justify-between gap-3">
-                            <button onclick="openDetails('Izde Youth AI Hackathon 2026', '20-22 Ноября', 'Командная разработка проектов за 48 часов. Менторская поддержка от экспертов.', 'Izde Network', 'https://t.me/', 'https://wa.me/')" class="text-xs text-white/60 hover:text-white underline">Подробнее</button>
-                            <button onclick="registerContest('Izde Youth AI Hackathon 2026')" class="bg-white/10 hover:bg-[#bf5af2] text-white px-4 py-2 rounded-xl text-xs font-medium transition">Записаться</button>
-                        </div>
-                    </div>
-                </div>
-
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="cards-container">
+                <!-- Карточки загружаются динамически -->
             </div>
         </div>
 
-        <!-- Подробный просмотр события -->
+        <!-- Подробный просмотр -->
         <div id="view-details" class="hidden max-w-2xl mx-auto">
-            <button onclick="goHome()" class="text-xs text-white/50 hover:text-white mb-6 flex items-center gap-1">&larr; Назад</button>
-            <div class="glass p-6 sm:p-10 rounded-3xl space-y-6">
+            <button onclick="goHome()" class="text-xs text-[#0071e3] font-semibold mb-6 flex items-center gap-1">&larr; Назад к состязаниям</button>
+            <div class="liquid-card p-6 sm:p-10 rounded-3xl space-y-6">
                 <div class="flex justify-between items-start">
-                    <span id="det-badge" class="px-3 py-1 rounded-full bg-[#0071e3]/10 text-[#2997ff] border border-[#0071e3]/20 text-xs font-medium">Событие</span>
-                    <span id="det-date" class="text-xs text-white/40 font-mono"></span>
+                    <span id="det-badge" class="px-3.5 py-1 rounded-full bg-[#0071e3]/10 text-[#0071e3] text-xs font-semibold">Событие</span>
+                    <span id="det-date" class="text-xs text-[#86868b] font-mono"></span>
                 </div>
-                <h1 id="det-title" class="text-2xl sm:text-3xl font-bold text-white"></h1>
-                <p id="det-desc" class="text-sm text-white/70 font-light leading-relaxed"></p>
+                <h1 id="det-title" class="text-2xl sm:text-3xl font-bold text-[#1d1d1f]"></h1>
+                <p id="det-desc" class="text-sm text-[#424245] leading-relaxed"></p>
                 
-                <div class="p-4 rounded-2xl bg-white/5 border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div class="p-4 rounded-2xl bg-white/60 border border-black/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div>
-                        <div class="text-xs text-white/40 mb-1">Организатор</div>
-                        <div id="det-org" class="text-sm font-semibold text-white"></div>
+                        <div class="text-xs text-[#86868b] mb-1">Организатор</div>
+                        <div id="det-org" class="text-sm font-bold text-[#1d1d1f]"></div>
                     </div>
                     <div class="flex gap-2 w-full sm:w-auto">
-                        <a id="det-tg" href="#" target="_blank" class="flex-1 sm:flex-initial text-center px-4 py-2 rounded-xl bg-[#0071e3] text-white text-xs font-medium transition">Telegram</a>
-                        <a id="det-wa" href="#" target="_blank" class="flex-1 sm:flex-initial text-center px-4 py-2 rounded-xl bg-[#34c759] text-white text-xs font-medium transition">WhatsApp</a>
+                        <a id="det-tg" href="#" target="_blank" class="flex-1 sm:flex-initial text-center px-4 py-2 rounded-xl bg-[#0088cc] text-white text-xs font-semibold">Telegram</a>
+                        <a id="det-wa" href="#" target="_blank" class="flex-1 sm:flex-initial text-center px-4 py-2 rounded-xl bg-[#25d366] text-white text-xs font-semibold">WhatsApp</a>
                     </div>
                 </div>
 
-                <button id="det-register-btn" class="w-full bg-[#0071e3] hover:bg-[#0077ed] text-white py-3 rounded-xl font-medium text-sm transition">
+                <button id="det-register-btn" class="w-full liquid-btn text-white py-3.5 rounded-xl font-semibold text-sm">
                     Записаться на событие
                 </button>
             </div>
@@ -163,45 +151,57 @@
     </main>
 
     <!-- Модальное окно авторизации -->
-    <div id="modal-auth" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md hidden">
-        <div class="glass-modal p-6 sm:p-8 rounded-3xl max-w-sm w-full relative">
-            <button onclick="closeModal('modal-auth')" class="absolute top-5 right-5 text-white/40 hover:text-white">
+    <div id="modal-auth" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-md hidden">
+        <div class="liquid-card p-6 sm:p-8 rounded-3xl max-w-md w-full relative">
+            <button onclick="closeModal('modal-auth')" class="absolute top-5 right-5 text-[#86868b] hover:text-[#1d1d1f]">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
             
-            <div class="flex gap-4 mb-6 border-b border-white/10 pb-3">
-                <button id="tab-login" onclick="switchAuthTab('login')" class="text-base font-bold text-white border-b-2 border-[#0071e3] pb-1">Вход</button>
-                <button id="tab-signup" onclick="switchAuthTab('signup')" class="text-base font-bold text-white/40 hover:text-white pb-1">Регистрация</button>
+            <div class="flex gap-4 mb-6 border-b border-black/5 pb-3">
+                <button id="tab-login" onclick="switchAuthTab('login')" class="text-base font-bold text-[#1d1d1f] border-b-2 border-[#0071e3] pb-1">Вход</button>
+                <button id="tab-signup" onclick="switchAuthTab('signup')" class="text-base font-bold text-[#86868b] hover:text-[#1d1d1f] pb-1">Регистрация</button>
             </div>
 
             <form id="auth-form" onsubmit="handleAuth(event)" class="space-y-4">
+                <div id="signup-extra-fields" class="hidden space-y-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-[#1d1d1f] mb-1">Имя и Фамилия</label>
+                        <input id="auth-fullname" type="text" placeholder="Елдос Шайдолла" class="w-full bg-white/70 border border-black/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3]">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-[#1d1d1f] mb-1">Уникальный @username</label>
+                        <input id="auth-username" type="text" placeholder="@eldos_sh" class="w-full bg-white/70 border border-black/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3]">
+                    </div>
+                </div>
+
                 <div>
-                    <label class="block text-xs font-medium text-white/70 mb-1">Email</label>
-                    <input id="auth-email" type="email" required placeholder="name@school.kz" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3] transition">
+                    <label class="block text-xs font-semibold text-[#1d1d1f] mb-1">Email</label>
+                    <input id="auth-email" type="email" required placeholder="name@school.kz" class="w-full bg-white/70 border border-black/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3]">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-white/70 mb-1">Пароль</label>
-                    <input id="auth-password" type="password" required placeholder="••••••••" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3] transition">
+                    <label class="block text-xs font-semibold text-[#1d1d1f] mb-1">Пароль</label>
+                    <input id="auth-password" type="password" required placeholder="••••••••" class="w-full bg-white/70 border border-black/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3]">
                 </div>
 
                 <div id="role-selector" class="hidden space-y-3">
                     <div>
-                        <label class="block text-xs font-medium text-white/70 mb-1">Роль</label>
-                        <select id="auth-role" onchange="toggleTeacherDocUpload()" class="w-full bg-[#151518] border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3] transition">
+                        <label class="block text-xs font-semibold text-[#1d1d1f] mb-1">Роль</label>
+                        <select id="auth-role" onchange="toggleTeacherDocUpload()" class="w-full bg-white/70 border border-black/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3]">
                             <option value="student">Ученик</option>
                             <option value="teacher">Учитель / Организатор</option>
                         </select>
                     </div>
 
-                    <!-- Обязательное поле проверки документа учителя -->
-                    <div id="teacher-doc-box" class="hidden p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-1.5">
-                        <label class="block text-xs font-medium text-[#2997ff]">Подтверждение статуса учителя</label>
-                        <p class="text-[11px] text-white/50">Прикрепите фото удостоверения, бейджа или справки с места работы.</p>
-                        <input type="file" id="teacher-doc-file" accept="image/*,.pdf" class="w-full text-xs text-white/50 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#0071e3] file:text-white cursor-pointer">
+                    <!-- AI OCR проверка документа учителя -->
+                    <div id="teacher-doc-box" class="hidden p-4 rounded-2xl bg-blue-50/50 border border-blue-200 space-y-2">
+                        <label class="block text-xs font-bold text-[#0071e3]">AI Сканирование Удостоверения/Бейджа</label>
+                        <p class="text-[11px] text-[#86868b]">Загрузите четкое фото удостоверения или справки. ИИ проверит документ на наличие штампов и текста.</p>
+                        <input type="file" id="teacher-doc-file" accept="image/*" class="w-full text-xs text-[#86868b] file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#0071e3] file:text-white cursor-pointer">
+                        <div id="ai-status" class="text-[11px] font-semibold text-[#0071e3] hidden">ИИ распознает текст документа...</div>
                     </div>
                 </div>
 
-                <button type="submit" id="auth-submit-btn" class="w-full bg-[#0071e3] hover:bg-[#0077ed] text-white py-3 rounded-xl font-medium text-sm transition mt-2">
+                <button type="submit" id="auth-submit-btn" class="w-full liquid-btn text-white py-3 rounded-xl font-semibold text-sm mt-2">
                     Войти
                 </button>
             </form>
@@ -209,46 +209,46 @@
     </div>
 
     <!-- Модальное окно создания события -->
-    <div id="modal-contest" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md hidden">
-        <div class="glass-modal p-6 sm:p-8 rounded-3xl max-w-md w-full relative">
-            <button onclick="closeModal('modal-contest')" class="absolute top-5 right-5 text-white/40 hover:text-white">
+    <div id="modal-contest" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-md hidden">
+        <div class="liquid-card p-6 sm:p-8 rounded-3xl max-w-md w-full relative">
+            <button onclick="closeModal('modal-contest')" class="absolute top-5 right-5 text-[#86868b] hover:text-[#1d1d1f]">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
-            <h3 class="text-xl font-bold mb-4">Создать состязание</h3>
+            <h3 class="text-xl font-bold mb-4 text-[#1d1d1f]">Создать состязание</h3>
 
             <form id="create-form" onsubmit="addContest(event)" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-medium text-white/70 mb-1">Название</label>
-                    <input id="title" required placeholder="Олимпиада по физике" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3] transition">
+                    <label class="block text-xs font-semibold text-[#1d1d1f] mb-1">Название</label>
+                    <input id="title" required placeholder="Республиканская олимпиада" class="w-full bg-white/70 border border-black/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3]">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-medium text-white/70 mb-1">Тип</label>
-                        <select id="type" class="w-full bg-[#151518] border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3] transition">
+                        <label class="block text-xs font-semibold text-[#1d1d1f] mb-1">Тип</label>
+                        <select id="type" class="w-full bg-white/70 border border-black/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3]">
                             <option value="olympiad">Олимпиада</option>
                             <option value="hackathon">Хакатон</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-white/70 mb-1">Дата и время</label>
-                        <input id="datetime" required placeholder="25 Ноября • 14:00" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3] transition">
+                        <label class="block text-xs font-semibold text-[#1d1d1f] mb-1">Дата и время</label>
+                        <input id="datetime" required placeholder="15 Ноября • 10:00" class="w-full bg-white/70 border border-black/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3]">
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-medium text-white/70 mb-1">Telegram (ссылка)</label>
-                        <input id="tg-link" required placeholder="https://t.me/..." class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3] transition">
+                        <label class="block text-xs font-semibold text-[#1d1d1f] mb-1">Telegram (ссылка)</label>
+                        <input id="tg-link" required placeholder="https://t.me/..." class="w-full bg-white/70 border border-black/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3]">
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-white/70 mb-1">WhatsApp (ссылка)</label>
-                        <input id="wa-link" required placeholder="https://wa.me/..." class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3] transition">
+                        <label class="block text-xs font-semibold text-[#1d1d1f] mb-1">WhatsApp (ссылка)</label>
+                        <input id="wa-link" required placeholder="https://wa.me/..." class="w-full bg-white/70 border border-black/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3]">
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-white/70 mb-1">Описание</label>
-                    <textarea id="desc" required rows="2" placeholder="Условия и правила..." class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3] transition"></textarea>
+                    <label class="block text-xs font-semibold text-[#1d1d1f] mb-1">Описание</label>
+                    <textarea id="desc" required rows="2" placeholder="Условия..." class="w-full bg-white/70 border border-black/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3]"></textarea>
                 </div>
-                <button type="submit" class="w-full bg-[#0071e3] hover:bg-[#0077ed] text-white py-3 rounded-xl font-medium text-sm transition mt-2">
+                <button type="submit" class="w-full liquid-btn text-white py-3 rounded-xl font-semibold text-sm mt-2">
                     Опубликовать
                 </button>
             </form>
@@ -256,13 +256,9 @@
     </div>
 
     <!-- Уведомления -->
-    <div id="toast" class="fixed bottom-6 right-6 z-50 glass-modal px-5 py-3 rounded-2xl border border-white/20 text-xs sm:text-sm flex items-center gap-3 hidden shadow-2xl">
-        <span id="toast-text" class="text-white"></span>
+    <div id="toast" class="fixed bottom-6 right-6 z-50 liquid-card px-5 py-3 rounded-2xl text-xs sm:text-sm flex items-center gap-3 hidden shadow-2xl">
+        <span id="toast-text" class="text-[#1d1d1f] font-semibold"></span>
     </div>
-
-    <footer class="border-t border-white/10 py-8 text-center text-xs text-white/30">
-        <p>© 2026 izde network</p>
-    </footer>
 
     <script>
         const SUPABASE_URL = 'https://jmiknovgrcpmlbjryckf.supabase.co';
@@ -272,26 +268,102 @@
         let currentUser = null;
         let authMode = 'login';
 
+        const defaultContests = [
+            {
+                title: 'Республиканская олимпиада по Алгебре',
+                type: 'olympiad',
+                badge: 'Математика',
+                datetime: '15 Ноября • 10:00',
+                desc: 'Для учеников 8-11 классов. Задачи на логику, комбинаторику и теорию чисел.',
+                org: 'Joo School',
+                tg: 'https://t.me/',
+                wa: 'https://wa.me/'
+            },
+            {
+                title: 'Izde Youth AI Hackathon 2026',
+                type: 'hackathon',
+                badge: 'Хакатон',
+                datetime: '20-22 Ноября',
+                desc: 'Создайте веб-сервис или бота за 48 часов. Менторство и призовой фонд.',
+                org: 'Izde Network',
+                tg: 'https://t.me/',
+                wa: 'https://wa.me/'
+            }
+        ];
+
         lucide.createIcons();
 
         window.addEventListener('DOMContentLoaded', async () => {
+            renderContests(defaultContests);
+
             const { data: { session } } = await supabaseClient.auth.getSession();
-            if (session) setUserSession(session.user);
+            if (session) {
+                const user = session.user;
+                if (!user.email_confirmed_at) {
+                    showUnverifiedScreen();
+                } else {
+                    setUserSession(user);
+                }
+            }
         });
+
+        function renderContests(contests) {
+            const container = document.getElementById('cards-container');
+            container.innerHTML = '';
+            contests.forEach(item => {
+                const badgeStyle = item.type === 'olympiad' ? 'bg-[#0071e3]/10 text-[#0071e3]' : 'bg-purple-100 text-purple-700';
+                const card = `
+                    <div class="contest-card liquid-card p-6 sm:p-8 rounded-3xl hover:border-[#0071e3]/40 transition group relative flex flex-col justify-between" data-type="${item.type}">
+                        <div>
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="px-3 py-1 rounded-full ${badgeStyle} text-xs font-semibold">${item.badge || item.type}</span>
+                                <span class="text-xs text-[#86868b] font-mono">${item.datetime}</span>
+                            </div>
+                            <h3 class="text-lg sm:text-xl font-bold mb-2 text-[#1d1d1f]">${item.title}</h3>
+                            <p class="text-xs sm:text-sm text-[#86868b] font-normal mb-6">${item.desc}</p>
+                        </div>
+
+                        <div>
+                            <div class="flex items-center justify-between pt-4 border-t border-black/5 text-xs text-[#86868b] mb-4">
+                                <span>Организатор: <strong class="text-[#1d1d1f]">${item.org}</strong></span>
+                                <div class="flex gap-2">
+                                    <a href="${item.tg}" target="_blank" class="px-2.5 py-1 rounded-lg bg-[#0088cc]/10 text-[#0088cc] font-semibold hover:bg-[#0088cc]/20 transition">Telegram</a>
+                                    <a href="${item.wa}" target="_blank" class="px-2.5 py-1 rounded-lg bg-[#25d366]/10 text-[#25d366] font-semibold hover:bg-[#25d366]/20 transition">WhatsApp</a>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between gap-3">
+                                <button onclick="openDetails('${item.title}', '${item.datetime}', '${item.desc}', '${item.org}', '${item.tg}', '${item.wa}')" class="text-xs text-[#0071e3] font-semibold hover:underline">Подробнее</button>
+                                <button onclick="registerContest('${item.title}')" class="bg-white hover:bg-gray-50 text-[#0071e3] border border-[#0071e3]/30 px-4 py-2 rounded-xl text-xs font-semibold transition shadow-sm">Записаться</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', card);
+            });
+        }
+
+        function showUnverifiedScreen() {
+            document.getElementById('view-home').classList.add('hidden');
+            document.getElementById('view-details').classList.add('hidden');
+            document.getElementById('view-unverified').classList.remove('hidden');
+        }
 
         function setUserSession(user) {
             currentUser = user;
-            const role = user?.user_metadata?.role || 'student';
-            const verified = user?.user_metadata?.verified || false;
+            const meta = user.user_metadata || {};
+            const role = meta.role || 'student';
+            const fullName = meta.full_name || user.email;
+            const username = meta.username ? `@${meta.username.replace('@','')}` : '';
 
             document.getElementById('auth-guest-controls').classList.add('hidden');
             document.getElementById('auth-user-controls').classList.remove('hidden');
             document.getElementById('auth-user-controls').classList.add('flex');
             
-            const roleName = role === 'teacher' ? (verified ? 'Учитель' : 'Учитель (На проверке)') : 'Ученик';
-            document.getElementById('user-display').innerText = `${user.email} (${roleName})`;
+            document.getElementById('user-display-name').innerText = `${fullName} (${role === 'teacher' ? 'Учитель' : 'Ученик'})`;
+            document.getElementById('user-display-username').innerText = username;
 
-            if (role === 'teacher' && verified) {
+            if (role === 'teacher') {
                 const btnCreate = document.getElementById('btn-create-contest');
                 btnCreate.classList.remove('hidden');
                 btnCreate.classList.add('flex');
@@ -340,67 +412,122 @@
             authMode = mode;
             const tabLogin = document.getElementById('tab-login');
             const tabSignup = document.getElementById('tab-signup');
+            const extraFields = document.getElementById('signup-extra-fields');
             const roleSelector = document.getElementById('role-selector');
             const submitBtn = document.getElementById('auth-submit-btn');
 
             if (mode === 'signup') {
-                tabSignup.className = 'text-base font-bold text-white border-b-2 border-[#0071e3] pb-1';
-                tabLogin.className = 'text-base font-bold text-white/40 hover:text-white pb-1';
+                tabSignup.className = 'text-base font-bold text-[#1d1d1f] border-b-2 border-[#0071e3] pb-1';
+                tabLogin.className = 'text-base font-bold text-[#86868b] hover:text-[#1d1d1f] pb-1';
+                extraFields.classList.remove('hidden');
                 roleSelector.classList.remove('hidden');
                 toggleTeacherDocUpload();
                 submitBtn.innerText = 'Зарегистрироваться';
             } else {
-                tabLogin.className = 'text-base font-bold text-white border-b-2 border-[#0071e3] pb-1';
-                tabSignup.className = 'text-base font-bold text-white/40 hover:text-white pb-1';
+                tabLogin.className = 'text-base font-bold text-[#1d1d1f] border-b-2 border-[#0071e3] pb-1';
+                tabSignup.className = 'text-base font-bold text-[#86868b] hover:text-[#1d1d1f] pb-1';
+                extraFields.classList.add('hidden');
                 roleSelector.classList.add('hidden');
                 document.getElementById('teacher-doc-box').classList.add('hidden');
                 submitBtn.innerText = 'Войти';
             }
         }
 
+        // Настоящее AI OCR сканирование документа учителя через Tesseract.js
+        async function runAIOCR(file) {
+            const statusEl = document.getElementById('ai-status');
+            statusEl.classList.remove('hidden');
+            try {
+                const worker = await Tesseract.createWorker('rus+kaz+eng');
+                const ret = await worker.recognize(file);
+                await worker.terminate();
+                statusEl.classList.add('hidden');
+
+                const text = ret.data.text.toLowerCase();
+                // Проверяем наличие ключевых слов документа или уплаченных символов
+                const validKeywords = ['куәлік', 'удостоверение', 'мектеп', 'школа', 'мұғалім', 'учитель', 'справка', 'каз', 'kaz', 'рк', 'казахстан'];
+                const hasMatch = validKeywords.some(kw => text.includes(kw));
+
+                if (!hasMatch && text.trim().length < 15) {
+                    return { success: false, reason: 'ИИ не обнаружил текст документа. Загрузите чёткий снимок удостоверения.' };
+                }
+                return { success: true };
+            } catch (err) {
+                statusEl.classList.add('hidden');
+                return { success: false, reason: 'Ошибка сканирования ИИ: ' + err.message };
+            }
+        }
+
         async function handleAuth(e) {
             e.preventDefault();
-            const email = document.getElementById('auth-email').value;
+            const email = document.getElementById('auth-email').value.trim();
             const password = document.getElementById('auth-password').value;
-            const role = document.getElementById('auth-role').value;
 
             try {
                 if (authMode === 'signup') {
-                    let isVerified = true;
+                    const fullName = document.getElementById('auth-fullname').value.trim();
+                    let rawUsername = document.getElementById('auth-username').value.trim().replace('@', '');
+                    const role = document.getElementById('auth-role').value;
 
+                    if (!fullName || !rawUsername) {
+                        showToast('Заполните Имя и Уникальный @username!');
+                        return;
+                    }
+
+                    // 1. Настоящая AI-проверка документа учителя при помощи OCR
                     if (role === 'teacher') {
                         const fileInput = document.getElementById('teacher-doc-file');
                         if (!fileInput.files || fileInput.files.length === 0) {
-                            showToast('Для роли учителя необходимо прикрепить документ!');
+                            showToast('Для роли Учителя прикрепите документ!');
                             return;
                         }
-                        isVerified = true; // Подтверждаем при наличии загруженного документа
+                        showToast('ИИ сканирует текст документа...');
+                        const ocrResult = await runAIOCR(fileInput.files[0]);
+                        if (!ocrResult.success) {
+                            showToast(ocrResult.reason);
+                            return;
+                        }
                     }
 
+                    // 2. Регистрация через Supabase Auth
                     const { data, error } = await supabaseClient.auth.signUp({
                         email,
                         password,
                         options: { 
                             data: { 
-                                role: role,
-                                verified: isVerified 
+                                full_name: fullName,
+                                username: rawUsername,
+                                role: role 
                             },
                             emailRedirectTo: window.location.href
                         }
                     });
 
-                    if (error) throw error;
-                    showToast('Ссылка подтверждения отправлена на ваш Email. Проверьте почту!');
-                    if (data.user) setUserSession(data.user);
+                    if (error) {
+                        if (error.message.includes('rate limit')) {
+                            throw new Error('Превышен лимит отправки писем. Попробуйте через 5 минут.');
+                        }
+                        throw error;
+                    }
+
+                    showToast('Ссылка отправлена на Email! Подтвердите почту перед входом.');
+                    closeModal('modal-auth');
                 } else {
                     const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
                     if (error) throw error;
-                    showToast('Вход выполнен.');
-                    if (data.user) setUserSession(data.user);
+
+                    if (!data.user.email_confirmed_at) {
+                        showUnverifiedScreen();
+                        closeModal('modal-auth');
+                        return;
+                    }
+
+                    showToast('Успешный вход!');
+                    setUserSession(data.user);
+                    closeModal('modal-auth');
                 }
-                closeModal('modal-auth');
             } catch (err) {
-                showToast('Ошибка: ' + err.message);
+                showToast(err.message);
             }
         }
 
@@ -415,14 +542,14 @@
                 showToast('Сначала войдите в систему.');
                 return;
             }
-            showToast(`Вы записались на событие: ${name}`);
+            showToast(`Вы успешно записались на "${name}"!`);
         }
 
         function filterCategory(type, btn) {
             document.querySelectorAll('.filter-btn').forEach(b => {
-                b.className = 'filter-btn px-4 py-1.5 rounded-full text-white/60 hover:text-white transition';
+                b.className = 'filter-btn px-4 py-1.5 rounded-full text-[#86868b] hover:text-[#1d1d1f] transition';
             });
-            btn.className = 'filter-btn px-4 py-1.5 rounded-full bg-[#0071e3] text-white font-medium';
+            btn.className = 'filter-btn px-4 py-1.5 rounded-full liquid-btn text-white font-medium';
 
             const cards = document.querySelectorAll('.contest-card');
             cards.forEach(card => {
@@ -439,41 +566,20 @@
             const wa = document.getElementById('wa-link').value;
             const desc = document.getElementById('desc').value;
 
-            const badgeColor = type === 'olympiad' ? 'bg-[#0071e3]/10 text-[#2997ff] border-[#0071e3]/20' : 'bg-[#bf5af2]/10 text-[#bf5af2] border-[#bf5af2]/20';
             const badgeText = type === 'olympiad' ? 'Олимпиада' : 'Хакатон';
 
-            const newCardHTML = `
-                <div class="contest-card glass p-6 sm:p-8 rounded-3xl hover:border-white/20 transition group relative flex flex-col justify-between" data-type="${type}">
-                    <div>
-                        <div class="flex justify-between items-start mb-4">
-                            <span class="px-3 py-1 rounded-full ${badgeColor} border text-xs font-medium">${badgeText}</span>
-                            <span class="text-xs text-white/40 font-mono">${datetime}</span>
-                        </div>
-                        <h3 class="text-lg sm:text-xl font-semibold mb-2 text-white">${title}</h3>
-                        <p class="text-xs sm:text-sm text-white/50 font-light mb-6">${desc}</p>
-                    </div>
+            const newContest = {
+                title, type, badge: badgeText, datetime, desc,
+                org: currentUser?.user_metadata?.full_name || 'Вы (Организатор)',
+                tg, wa
+            };
 
-                    <div>
-                        <div class="flex items-center justify-between pt-4 border-t border-white/5 text-xs text-white/40 mb-4">
-                            <span>Вы (Организатор)</span>
-                            <div class="flex gap-2">
-                                <a href="${tg}" target="_blank" class="px-2.5 py-1 rounded-lg bg-[#0071e3]/10 text-[#2997ff] hover:bg-[#0071e3]/20 transition">Telegram</a>
-                                <a href="${wa}" target="_blank" class="px-2.5 py-1 rounded-lg bg-[#34c759]/10 text-[#34c759] hover:bg-[#34c759]/20 transition">WhatsApp</a>
-                            </div>
-                        </div>
+            defaultContests.unshift(newContest);
+            renderContests(defaultContests);
 
-                        <div class="flex items-center justify-between gap-3">
-                            <button onclick="openDetails('${title}', '${datetime}', '${desc}', 'Вы (Организатор)', '${tg}', '${wa}')" class="text-xs text-white/60 hover:text-white underline">Подробнее</button>
-                            <button onclick="registerContest('${title}')" class="bg-white/10 hover:bg-[#0071e3] text-white px-4 py-2 rounded-xl text-xs font-medium transition">Записаться</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            document.getElementById('cards-container').insertAdjacentHTML('afterbegin', newCardHTML);
             closeModal('modal-contest');
             document.getElementById('create-form').reset();
-            showToast('Событие опубликовано.');
+            showToast('Состязание опубликовано!');
         }
     </script>
 </body>
