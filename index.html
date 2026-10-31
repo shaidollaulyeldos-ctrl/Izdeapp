@@ -11,12 +11,13 @@
         body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); }
         .glass-nav { background: rgba(10, 10, 12, 0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+        .glass-modal { background: rgba(20, 20, 25, 0.9); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.15); }
     </style>
 </head>
 <body class="bg-[#050507] text-[#f5f5f7] antialiased selection:bg-[#0071e3] selection:text-white min-h-screen">
 
     <!-- Header / Nav -->
-    <header class="fixed top-0 left-0 right-0 z-50 glass-nav">
+    <header class="fixed top-0 left-0 right-0 z-40 glass-nav">
         <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-3">
                 <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-[#0071e3] to-[#42a5f5] flex items-center justify-center font-bold text-white text-sm shadow-lg shadow-[#0071e3]/20">
@@ -28,11 +29,10 @@
                 <a href="#" class="text-white transition">Олимпиады</a>
                 <a href="#" class="hover:text-white transition">Хакатоны</a>
                 <a href="#" class="hover:text-white transition">Рейтинг</a>
-                <a href="#" class="hover:text-white transition">Школам</a>
             </nav>
             <div class="flex items-center space-x-4">
-                <button onclick="alert('Форма создания олимпиады')" class="bg-[#0071e3] hover:bg-[#0077ed] text-white px-4 py-2 rounded-full text-xs font-medium transition shadow-sm shadow-[#0071e3]/30">
-                    + Создать состязание
+                <button onclick="openModal()" class="bg-[#0071e3] hover:bg-[#0077ed] text-white px-4 py-2 rounded-full text-xs font-medium transition shadow-sm shadow-[#0071e3]/30 flex items-center gap-1.5">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i> Создать состязание
                 </button>
             </div>
         </div>
@@ -56,15 +56,15 @@
         <!-- Stats Grid -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
             <div class="glass p-6 rounded-3xl text-center">
-                <div class="text-3xl font-bold text-white mb-1">24+</div>
-                <div class="text-xs text-white/40 font-medium">Активных олимпиад</div>
+                <div class="text-3xl font-bold text-white mb-1" id="stat-count">2</div>
+                <div class="text-xs text-white/40 font-medium">Активных состязаний</div>
             </div>
             <div class="glass p-6 rounded-3xl text-center">
                 <div class="text-3xl font-bold text-white mb-1">1,400+</div>
                 <div class="text-xs text-white/40 font-medium">Участников</div>
             </div>
             <div class="glass p-6 rounded-3xl text-center">
-                <div class="text-3xl font-bold-text-white mb-1">100%</div>
+                <div class="text-3xl font-bold text-white mb-1">100%</div>
                 <div class="text-xs text-white/40 font-medium">Автоматизация</div>
             </div>
             <div class="glass p-6 rounded-3xl text-center">
@@ -76,18 +76,18 @@
         <!-- Contests Section -->
         <section>
             <div class="flex items-center justify-between mb-8">
-                <h2 class="text-2xl font-semibold tracking-tight">Ближайшие состязания</h2>
+                <h2 class="text-2xl font-semibold tracking-tight">Состязания</h2>
                 <div class="flex gap-2 bg-white/5 p-1 rounded-full border border-white/10 text-xs">
-                    <button class="px-3 py-1.5 rounded-full bg-[#0071e3] text-white font-medium">Все</button>
-                    <button class="px-3 py-1.5 rounded-full text-white/60 hover:text-white transition">Олимпиады</button>
-                    <button class="px-3 py-1.5 rounded-full text-white/60 hover:text-white transition">Хакатоны</button>
+                    <button onclick="filterCategory('all', this)" class="filter-btn px-3 py-1.5 rounded-full bg-[#0071e3] text-white font-medium">Все</button>
+                    <button onclick="filterCategory('olympiad', this)" class="filter-btn px-3 py-1.5 rounded-full text-white/60 hover:text-white transition">Олимпиады</button>
+                    <button onclick="filterCategory('hackathon', this)" class="filter-btn px-3 py-1.5 rounded-full text-white/60 hover:text-white transition">Хакатоны</button>
                 </div>
             </div>
 
             <!-- Cards Grid -->
-            <div class="grid md:grid-cols-2 gap-6">
+            <div class="grid md:grid-cols-2 gap-6" id="cards-container">
                 <!-- Card 1 -->
-                <div class="glass p-8 rounded-3xl hover:border-white/20 transition group relative overflow-hidden">
+                <div class="contest-card glass p-8 rounded-3xl hover:border-white/20 transition group relative overflow-hidden" data-type="olympiad">
                     <div class="flex justify-between items-start mb-6">
                         <span class="px-3 py-1 rounded-full bg-[#0071e3]/10 text-[#2997ff] border border-[#0071e3]/20 text-xs font-medium">
                             Математика
@@ -95,15 +95,17 @@
                         <span class="text-xs text-white/40 font-mono">15 Ноября • 90 мин</span>
                     </div>
                     <h3 class="text-xl font-semibold mb-2 group-hover:text-[#2997ff] transition">Республиканская олимпиада по Алгебре</h3>
-                    <p class="text-sm text-white/50 font-light mb-6">Для учеников 8-11 классов. Сложные задачи на логику, комбинаторику и теория чисел.</p>
+                    <p class="text-sm text-white/50 font-light mb-6">Для учеников 8-11 классов. Сложные задачи на логику, комбинаторику и теорию чисел.</p>
                     <div class="flex items-center justify-between pt-4 border-t border-white/5 text-xs text-white/40">
                         <span>Организатор: Joo School</span>
-                        <button class="text-white font-medium hover:underline flex items-center gap-1">Записаться &rarr;</button>
+                        <button onclick="register('Республиканская олимпиада по Алгебре')" class="text-white font-medium hover:text-[#2997ff] transition flex items-center gap-1">
+                            Записаться &rarr;
+                        </button>
                     </div>
                 </div>
 
                 <!-- Card 2 -->
-                <div class="glass p-8 rounded-3xl hover:border-white/20 transition group relative overflow-hidden">
+                <div class="contest-card glass p-8 rounded-3xl hover:border-white/20 transition group relative overflow-hidden" data-type="hackathon">
                     <div class="flex justify-between items-start mb-6">
                         <span class="px-3 py-1 rounded-full bg-[#bf5af2]/10 text-[#bf5af2] border border-[#bf5af2]/20 text-xs font-medium">
                             Хакатон / AI
@@ -114,20 +116,139 @@
                     <p class="text-sm text-white/50 font-light mb-6">Создайте веб-сервис или AI-бота за 48 часов. Призовой фонд и менторство для лучших стартапов.</p>
                     <div class="flex items-center justify-between pt-4 border-t border-white/5 text-xs text-white/40">
                         <span>Организатор: Izde Network</span>
-                        <button class="text-white font-medium hover:underline flex items-center gap-1">Зарегистрировать команду &rarr;</button>
+                        <button onclick="register('Izde Youth AI Hackathon')" class="text-white font-medium hover:text-[#bf5af2] transition flex items-center gap-1">
+                            Зарегистрировать команду &rarr;
+                        </button>
                     </div>
                 </div>
             </div>
         </section>
     </main>
 
-    <!-- Footer -->
+    <!-- Modal Form (Создание олимпиады) -->
+    <div id="modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md hidden">
+        <div class="glass-modal p-8 rounded-3xl max-w-lg w-full relative">
+            <button onclick="closeModal()" class="absolute top-6 right-6 text-white/40 hover:text-white">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <h3 class="text-2xl font-bold mb-2">Новое состязание</h3>
+            <p class="text-xs text-white/50 mb-6">Заполните форму, чтобы ученики могли зарегистрироваться.</p>
+
+            <form id="create-form" onsubmit="addContest(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-white/70 mb-1">Название состязания</label>
+                    <input id="title" required placeholder="Например: Школьная олимпиада по Физике" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3] transition">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-white/70 mb-1">Тип</label>
+                        <select id="type" class="w-full bg-[#151518] border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3] transition">
+                            <option value="olympiad">Олимпиада</option>
+                            <option value="hackathon">Хакатон</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-white/70 mb-1">Предмет / Сфера</label>
+                        <input id="subject" required placeholder="Информатика, Math..." class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3] transition">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-white/70 mb-1">Описание</label>
+                    <textarea id="desc" required rows="3" placeholder="Опишите правила и условия..." class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3] transition"></textarea>
+                </div>
+                <button type="submit" class="w-full bg-[#0071e3] hover:bg-[#0077ed] text-white py-3 rounded-xl font-medium text-sm transition mt-2">
+                    Опубликовать состязание
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 glass-modal px-6 py-4 rounded-2xl border border-white/20 text-sm flex items-center gap-3 hidden shadow-2xl">
+        <div class="w-6 h-6 rounded-full bg-[#34c759]/20 text-[#34c759] flex items-center justify-center font-bold text-xs">✓</div>
+        <span id="toast-text">Успешно!</span>
+    </div>
+
     <footer class="border-t border-white/10 py-8 text-center text-xs text-white/30">
-        <p>© 2026 izde network. Сделано с минимализмом для частных школ Казахстана.</p>
+        <p>© 2026 izde network. Сделано для частных школ Казахстана.</p>
     </footer>
 
     <script>
         lucide.createIcons();
+
+        function openModal() {
+            document.getElementById('modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.add('hidden');
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-text').innerText = message;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3500);
+        }
+
+        function register(name) {
+            showToast(`Вы успешно записались на "${name}"!`);
+        }
+
+        function filterCategory(type, btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => {
+                b.className = 'filter-btn px-3 py-1.5 rounded-full text-white/60 hover:text-white transition';
+            });
+            btn.className = 'filter-btn px-3 py-1.5 rounded-full bg-[#0071e3] text-white font-medium';
+
+            const cards = document.querySelectorAll('.contest-card');
+            cards.forEach(card => {
+                if (type === 'all' || card.dataset.type === type) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function addContest(e) {
+            e.preventDefault();
+            const title = document.getElementById('title').value;
+            const type = document.getElementById('type').value;
+            const subject = document.getElementById('subject').value;
+            const desc = document.getElementById('desc').value;
+
+            const badgeColor = type === 'olympiad' ? 'bg-[#0071e3]/10 text-[#2997ff] border-[#0071e3]/20' : 'bg-[#bf5af2]/10 text-[#bf5af2] border-[#bf5af2]/20';
+            const badgeText = type === 'olympiad' ? subject : `Хакатон / ${subject}`;
+
+            const newCardHTML = `
+                <div class="contest-card glass p-8 rounded-3xl hover:border-white/20 transition group relative overflow-hidden" data-type="${type}">
+                    <div class="flex justify-between items-start mb-6">
+                        <span class="px-3 py-1 rounded-full ${badgeColor} border text-xs font-medium">
+                            ${badgeText}
+                        </span>
+                        <span class="text-xs text-white/40 font-mono">Скоро • 60 мин</span>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 group-hover:text-[#2997ff] transition">${title}</h3>
+                    <p class="text-sm text-white/50 font-light mb-6">${desc}</p>
+                    <div class="flex items-center justify-between pt-4 border-t border-white/5 text-xs text-white/40">
+                        <span>Организатор: Вы</span>
+                        <button onclick="register('${title}')" class="text-white font-medium hover:underline flex items-center gap-1">
+                            Записаться &rarr;
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('cards-container').insertAdjacentHTML('afterbegin', newCardHTML);
+            closeModal();
+            document.getElementById('create-form').reset();
+            showToast('Состязание успешно создано и добавлено!');
+
+            // Update stats
+            const countEl = document.getElementById('stat-count');
+            countEl.innerText = parseInt(countEl.innerText) + 1;
+        }
     </script>
 </body>
 </html>
