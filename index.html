@@ -11,36 +11,36 @@
     <style>
         body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); }
-        .glass-nav { background: rgba(10, 10, 12, 0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
-        .glass-modal { background: rgba(20, 20, 25, 0.95); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.15); }
+        .glass-nav { background: rgba(10, 10, 12, 0.8); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+        .glass-modal { background: rgba(18, 18, 22, 0.95); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.15); }
     </style>
 </head>
 <body class="bg-[#050507] text-[#f5f5f7] antialiased selection:bg-[#0071e3] selection:text-white min-h-screen">
 
-    <!-- Header / Nav -->
+    <!-- Навигация -->
     <header class="fixed top-0 left-0 right-0 z-40 glass-nav">
-        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-[#0071e3] to-[#42a5f5] flex items-center justify-center font-bold text-white text-sm shadow-lg shadow-[#0071e3]/20">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="goHome()">
+                <div class="w-8 h-8 rounded-full bg-[#0071e3] flex items-center justify-center font-bold text-white text-sm">
                     i
                 </div>
-                <span class="font-semibold text-lg tracking-tight">izde <span class="text-white/40 font-normal">contest</span></span>
+                <span class="font-semibold text-base sm:text-lg tracking-tight">izde <span class="text-white/40 font-normal">contest</span></span>
             </div>
             
-            <div class="flex items-center space-x-4">
-                <button id="btn-create-contest" onclick="openModal('modal-contest')" class="hidden bg-[#0071e3] hover:bg-[#0077ed] text-white px-4 py-2 rounded-full text-xs font-medium transition shadow-sm shadow-[#0071e3]/30 items-center gap-1.5">
-                    <i data-lucide="plus" class="w-3.5 h-3.5"></i> Создать состязание
+            <div class="flex items-center space-x-3">
+                <button id="btn-create-contest" onclick="openModal('modal-contest')" class="hidden bg-[#0071e3] hover:bg-[#0077ed] text-white px-3.5 py-2 rounded-full text-xs font-medium transition items-center gap-1.5">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i> Создать
                 </button>
                 
                 <div id="auth-guest-controls">
-                    <button onclick="openModal('modal-auth')" class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full text-xs font-medium transition border border-white/10">
-                        Войти / Регистрация
+                    <button onclick="openModal('modal-auth')" class="bg-white/10 hover:bg-white/20 text-white px-3.5 py-2 rounded-full text-xs font-medium transition border border-white/10">
+                        Войти
                     </button>
                 </div>
 
-                <div id="auth-user-controls" class="hidden flex items-center space-x-3">
-                    <span id="user-display" class="text-xs text-white/70 font-mono bg-white/5 px-3 py-1.5 rounded-full border border-white/10"></span>
-                    <button onclick="logout()" class="text-xs text-red-400 hover:text-red-300 font-medium transition">
+                <div id="auth-user-controls" class="hidden flex items-center space-x-2">
+                    <span id="user-display" class="hidden sm:inline text-xs text-white/70 font-mono bg-white/5 px-3 py-1.5 rounded-full border border-white/10"></span>
+                    <button onclick="logout()" class="text-xs text-red-400 hover:text-red-300 font-medium px-2 py-1">
                         Выйти
                     </button>
                 </div>
@@ -48,101 +48,130 @@
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="max-w-6xl mx-auto px-6 pt-32 pb-20">
-        <section class="text-center max-w-3xl mx-auto mb-16">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-white/70 mb-6">
-                <span class="w-2 h-2 rounded-full bg-[#34c759] animate-pulse"></span>
-                Платформа с AI-проверкой для частных школ Казахстана
-            </div>
-            <h1 class="text-4xl sm:text-6xl font-bold tracking-tight text-white mb-6 leading-tight">
-                Олимпиады и хакатоны.<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-white via-white/80 to-white/30">В стиле совершенства.</span>
-            </h1>
-            <p class="text-lg text-white/50 max-w-xl mx-auto font-light leading-relaxed">
-                Защищенная экосистема для учеников и верифицированных преподавателей.
-            </p>
-        </section>
+    <!-- Основной контент -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 pt-28 sm:pt-32 pb-20">
+        
+        <!-- Главный экран -->
+        <div id="view-home">
+            <section class="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
+                <h1 class="text-3xl sm:text-5xl font-bold tracking-tight text-white mb-4">
+                    Олимпиады и хакатоны Казахстана.
+                </h1>
+                <p class="text-sm sm:text-base text-white/50 font-light leading-relaxed">
+                    Платформа для частных школ. Участвуй, побеждай и организуй состязания без лишней бюрократии.
+                </p>
+            </section>
 
-        <!-- Stats Grid -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
-            <div class="glass p-6 rounded-3xl text-center">
-                <div class="text-3xl font-bold text-white mb-1" id="stat-count">2</div>
-                <div class="text-xs text-white/40 font-medium">Активных состязаний</div>
+            <!-- Фильтры -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-8">
+                <h2 class="text-xl font-semibold tracking-tight">Активные события</h2>
+                <div class="flex gap-1.5 bg-white/5 p-1 rounded-full border border-white/10 text-xs self-start sm:self-auto">
+                    <button onclick="filterCategory('all', this)" class="filter-btn px-4 py-1.5 rounded-full bg-[#0071e3] text-white font-medium transition">Все</button>
+                    <button onclick="filterCategory('olympiad', this)" class="filter-btn px-4 py-1.5 rounded-full text-white/60 hover:text-white transition">Олимпиады</button>
+                    <button onclick="filterCategory('hackathon', this)" class="filter-btn px-4 py-1.5 rounded-full text-white/60 hover:text-white transition">Хакатоны</button>
+                </div>
             </div>
-            <div class="glass p-6 rounded-3xl text-center">
-                <div class="text-3xl font-bold text-white mb-1">1,400+</div>
-                <div class="text-xs text-white/40 font-medium">Участников</div>
-            </div>
-            <div class="glass p-6 rounded-3xl text-center">
-                <div class="text-3xl font-bold text-white mb-1">AI</div>
-                <div class="text-xs text-white/40 font-medium">Защита от школьников</div>
-            </div>
-            <div class="glass p-6 rounded-3xl text-center">
-                <div class="text-3xl font-bold text-[#34c759] mb-1">0 ₸</div>
-                <div class="text-xs text-white/40 font-medium">Бесплатно</div>
+
+            <!-- Сетка карточек -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5" id="cards-container">
+                
+                <!-- Карточка 1 -->
+                <div class="contest-card glass p-6 sm:p-8 rounded-3xl hover:border-white/20 transition group relative flex flex-col justify-between" data-type="olympiad">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="px-3 py-1 rounded-full bg-[#0071e3]/10 text-[#2997ff] border border-[#0071e3]/20 text-xs font-medium">Математика</span>
+                            <span class="text-xs text-white/40 font-mono">15 Ноября • 10:00</span>
+                        </div>
+                        <h3 class="text-lg sm:text-xl font-semibold mb-2 text-white">Республиканская олимпиада по Алгебре</h3>
+                        <p class="text-xs sm:text-sm text-white/50 font-light mb-6">Для учеников 8-11 классов. Задачи на логику, комбинаторику и теорию чисел.</p>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between pt-4 border-t border-white/5 text-xs text-white/40 mb-4">
+                            <span>Joo School</span>
+                            <div class="flex gap-2">
+                                <a href="https://t.me/" target="_blank" class="px-2.5 py-1 rounded-lg bg-[#0071e3]/10 text-[#2997ff] hover:bg-[#0071e3]/20 transition">Telegram</a>
+                                <a href="https://wa.me/" target="_blank" class="px-2.5 py-1 rounded-lg bg-[#34c759]/10 text-[#34c759] hover:bg-[#34c759]/20 transition">WhatsApp</a>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between gap-3">
+                            <button onclick="openDetails('Республиканская олимпиада по Алгебре', '15 Ноября • 10:00', 'Сложные задачи по алгебре для старшеклассников. Длительность: 90 минут. Формат: онлайн.', 'Joo School', 'https://t.me/', 'https://wa.me/')" class="text-xs text-white/60 hover:text-white underline">Подробнее</button>
+                            <button onclick="registerContest('Республиканская олимпиада по Алгебре')" class="bg-white/10 hover:bg-[#0071e3] text-white px-4 py-2 rounded-xl text-xs font-medium transition">Записаться</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Карточка 2 -->
+                <div class="contest-card glass p-6 sm:p-8 rounded-3xl hover:border-white/20 transition group relative flex flex-col justify-between" data-type="hackathon">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="px-3 py-1 rounded-full bg-[#bf5af2]/10 text-[#bf5af2] border border-[#bf5af2]/20 text-xs font-medium">Хакатон</span>
+                            <span class="text-xs text-white/40 font-mono">20-22 Ноября</span>
+                        </div>
+                        <h3 class="text-lg sm:text-xl font-semibold mb-2 text-white">Izde Youth AI Hackathon 2026</h3>
+                        <p class="text-xs sm:text-sm text-white/50 font-light mb-6">Создайте веб-сервис или бота за 48 часов. Менторство и призовой фонд.</p>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between pt-4 border-t border-white/5 text-xs text-white/40 mb-4">
+                            <span>Izde Network</span>
+                            <div class="flex gap-2">
+                                <a href="https://t.me/" target="_blank" class="px-2.5 py-1 rounded-lg bg-[#0071e3]/10 text-[#2997ff] hover:bg-[#0071e3]/20 transition">Telegram</a>
+                                <a href="https://wa.me/" target="_blank" class="px-2.5 py-1 rounded-lg bg-[#34c759]/10 text-[#34c759] hover:bg-[#34c759]/20 transition">WhatsApp</a>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between gap-3">
+                            <button onclick="openDetails('Izde Youth AI Hackathon 2026', '20-22 Ноября', 'Командная разработка проектов за 48 часов. Менторская поддержка от экспертов.', 'Izde Network', 'https://t.me/', 'https://wa.me/')" class="text-xs text-white/60 hover:text-white underline">Подробнее</button>
+                            <button onclick="registerContest('Izde Youth AI Hackathon 2026')" class="bg-white/10 hover:bg-[#bf5af2] text-white px-4 py-2 rounded-xl text-xs font-medium transition">Записаться</button>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
-        <!-- Contests Section -->
-        <section>
-            <div class="flex items-center justify-between mb-8">
-                <h2 class="text-2xl font-semibold tracking-tight">Состязания</h2>
-                <div class="flex gap-2 bg-white/5 p-1 rounded-full border border-white/10 text-xs">
-                    <button onclick="filterCategory('all', this)" class="filter-btn px-3 py-1.5 rounded-full bg-[#0071e3] text-white font-medium">Все</button>
-                    <button onclick="filterCategory('olympiad', this)" class="filter-btn px-3 py-1.5 rounded-full text-white/60 hover:text-white transition">Олимпиады</button>
-                    <button onclick="filterCategory('hackathon', this)" class="filter-btn px-3 py-1.5 rounded-full text-white/60 hover:text-white transition">Хакатоны</button>
+        <!-- Подробный просмотр события -->
+        <div id="view-details" class="hidden max-w-2xl mx-auto">
+            <button onclick="goHome()" class="text-xs text-white/50 hover:text-white mb-6 flex items-center gap-1">&larr; Назад</button>
+            <div class="glass p-6 sm:p-10 rounded-3xl space-y-6">
+                <div class="flex justify-between items-start">
+                    <span id="det-badge" class="px-3 py-1 rounded-full bg-[#0071e3]/10 text-[#2997ff] border border-[#0071e3]/20 text-xs font-medium">Событие</span>
+                    <span id="det-date" class="text-xs text-white/40 font-mono"></span>
                 </div>
-            </div>
-
-            <!-- Cards Container -->
-            <div class="grid md:grid-cols-2 gap-6" id="cards-container">
-                <div class="contest-card glass p-8 rounded-3xl hover:border-white/20 transition group relative overflow-hidden" data-type="olympiad">
-                    <div class="flex justify-between items-start mb-6">
-                        <span class="px-3 py-1 rounded-full bg-[#0071e3]/10 text-[#2997ff] border border-[#0071e3]/20 text-xs font-medium">
-                            Математика
-                        </span>
-                        <span class="text-xs text-white/40 font-mono">15 Ноября • 90 мин</span>
+                <h1 id="det-title" class="text-2xl sm:text-3xl font-bold text-white"></h1>
+                <p id="det-desc" class="text-sm text-white/70 font-light leading-relaxed"></p>
+                
+                <div class="p-4 rounded-2xl bg-white/5 border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div>
+                        <div class="text-xs text-white/40 mb-1">Организатор</div>
+                        <div id="det-org" class="text-sm font-semibold text-white"></div>
                     </div>
-                    <h3 class="text-xl font-semibold mb-2 group-hover:text-[#2997ff] transition">Республиканская олимпиада по Алгебре</h3>
-                    <p class="text-sm text-white/50 font-light mb-6">Для учеников 8-11 классов. Сложные задачи на логику, комбинаторику и теорию чисел.</p>
-                    <div class="flex items-center justify-between pt-4 border-t border-white/5 text-xs text-white/40">
-                        <span>Организатор: Joo School</span>
-                        <button onclick="registerContest('Республиканская олимпиада по Алгебре')" class="text-white font-medium hover:text-[#2997ff] transition flex items-center gap-1">
-                            Записаться &rarr;
-                        </button>
+                    <div class="flex gap-2 w-full sm:w-auto">
+                        <a id="det-tg" href="#" target="_blank" class="flex-1 sm:flex-initial text-center px-4 py-2 rounded-xl bg-[#0071e3] text-white text-xs font-medium transition">Telegram</a>
+                        <a id="det-wa" href="#" target="_blank" class="flex-1 sm:flex-initial text-center px-4 py-2 rounded-xl bg-[#34c759] text-white text-xs font-medium transition">WhatsApp</a>
                     </div>
                 </div>
 
-                <div class="contest-card glass p-8 rounded-3xl hover:border-white/20 transition group relative overflow-hidden" data-type="hackathon">
-                    <div class="flex justify-between items-start mb-6">
-                        <span class="px-3 py-1 rounded-full bg-[#bf5af2]/10 text-[#bf5af2] border border-[#bf5af2]/20 text-xs font-medium">
-                            Хакатон / AI
-                        </span>
-                        <span class="text-xs text-white/40 font-mono">20-22 Ноября</span>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-2 group-hover:text-[#bf5af2] transition">Izde Youth AI Hackathon 2026</h3>
-                    <p class="text-sm text-white/50 font-light mb-6">Создайте веб-сервис или AI-бота за 48 часов. Призовой фонд и менторство для лучших стартапов.</p>
-                    <div class="flex items-center justify-between pt-4 border-t border-white/5 text-xs text-white/40">
-                        <span>Организатор: Izde Network</span>
-                        <button onclick="registerContest('Izde Youth AI Hackathon')" class="text-white font-medium hover:text-[#bf5af2] transition flex items-center gap-1">
-                            Зарегистрировать команду &rarr;
-                        </button>
-                    </div>
-                </div>
+                <button id="det-register-btn" class="w-full bg-[#0071e3] hover:bg-[#0077ed] text-white py-3 rounded-xl font-medium text-sm transition">
+                    Записаться на событие
+                </button>
             </div>
-        </section>
+        </div>
+
     </main>
 
-    <!-- Modal: Auth -->
-    <div id="modal-auth" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md hidden">
-        <div class="glass-modal p-8 rounded-3xl max-w-md w-full relative">
-            <button onclick="closeModal('modal-auth')" class="absolute top-6 right-6 text-white/40 hover:text-white">
+    <!-- Модальное окно авторизации -->
+    <div id="modal-auth" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md hidden">
+        <div class="glass-modal p-6 sm:p-8 rounded-3xl max-w-sm w-full relative">
+            <button onclick="closeModal('modal-auth')" class="absolute top-5 right-5 text-white/40 hover:text-white">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
             
             <div class="flex gap-4 mb-6 border-b border-white/10 pb-3">
-                <button id="tab-login" onclick="switchAuthTab('login')" class="text-lg font-bold text-white border-b-2 border-[#0071e3] pb-1">Вход</button>
-                <button id="tab-signup" onclick="switchAuthTab('signup')" class="text-lg font-bold text-white/40 hover:text-white pb-1">Регистрация</button>
+                <button id="tab-login" onclick="switchAuthTab('login')" class="text-base font-bold text-white border-b-2 border-[#0071e3] pb-1">Вход</button>
+                <button id="tab-signup" onclick="switchAuthTab('signup')" class="text-base font-bold text-white/40 hover:text-white pb-1">Регистрация</button>
             </div>
 
             <form id="auth-form" onsubmit="handleAuth(event)" class="space-y-4">
@@ -155,21 +184,12 @@
                     <input id="auth-password" type="password" required placeholder="••••••••" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3] transition">
                 </div>
 
-                <div>
-                    <label class="block text-xs font-medium text-white/70 mb-1">Роль в системе</label>
-                    <select id="auth-role" onchange="toggleTeacherVerification()" class="w-full bg-[#151518] border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3] transition">
-                        <option value="student">Оқушы (Ученик)</option>
-                        <option value="teacher">Мұғалім (Учитель / Организатор)</option>
+                <div id="role-selector" class="hidden">
+                    <label class="block text-xs font-medium text-white/70 mb-1">Роль</label>
+                    <select id="auth-role" class="w-full bg-[#151518] border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3] transition">
+                        <option value="student">Ученик</option>
+                        <option value="teacher">Учитель / Организатор</option>
                     </select>
-                </div>
-
-                <!-- AI Verification block for Teachers -->
-                <div id="teacher-verification-box" class="hidden p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-                    <div class="flex items-center gap-2 text-xs font-medium text-[#2997ff]">
-                        <i data-lucide="shield-check" class="w-4 h-4"></i> AI-верификация учителя
-                    </div>
-                    <p class="text-[11px] text-white/50 leading-relaxed">Загрузите фото удостоверения личности, школьного бейджа или справки для подтверждения статуса.</p>
-                    <input type="file" id="teacher-doc" accept="image/*" class="w-full text-xs text-white/50 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#0071e3] file:text-white hover:file:bg-[#0077ed] cursor-pointer">
                 </div>
 
                 <button type="submit" id="auth-submit-btn" class="w-full bg-[#0071e3] hover:bg-[#0077ed] text-white py-3 rounded-xl font-medium text-sm transition mt-2">
@@ -179,21 +199,20 @@
         </div>
     </div>
 
-    <!-- Modal: Create Contest -->
-    <div id="modal-contest" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md hidden">
-        <div class="glass-modal p-8 rounded-3xl max-w-lg w-full relative">
-            <button onclick="closeModal('modal-contest')" class="absolute top-6 right-6 text-white/40 hover:text-white">
+    <!-- Модальное окно создания события (только для учителей) -->
+    <div id="modal-contest" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md hidden">
+        <div class="glass-modal p-6 sm:p-8 rounded-3xl max-w-md w-full relative">
+            <button onclick="closeModal('modal-contest')" class="absolute top-5 right-5 text-white/40 hover:text-white">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
-            <h3 class="text-2xl font-bold mb-2">Новое состязание</h3>
-            <p class="text-xs text-white/50 mb-6">Создание состязания от имени проверенного Учителя.</p>
+            <h3 class="text-xl font-bold mb-4">Создать состязание</h3>
 
             <form id="create-form" onsubmit="addContest(event)" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-medium text-white/70 mb-1">Название состязания</label>
-                    <input id="title" required placeholder="Например: Школьная олимпиада по Физике" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3] transition">
+                    <label class="block text-xs font-medium text-white/70 mb-1">Название</label>
+                    <input id="title" required placeholder="Олимпиада по физике" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3] transition">
                 </div>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-medium text-white/70 mb-1">Тип</label>
                         <select id="type" class="w-full bg-[#151518] border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3] transition">
@@ -202,29 +221,38 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-white/70 mb-1">Предмет / Сфера</label>
-                        <input id="subject" required placeholder="Информатика, Math..." class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3] transition">
+                        <label class="block text-xs font-medium text-white/70 mb-1">Дата и время</label>
+                        <input id="datetime" required placeholder="25 Ноября • 14:00" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3] transition">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-white/70 mb-1">Telegram (ссылка)</label>
+                        <input id="tg-link" required placeholder="https://t.me/..." class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3] transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-white/70 mb-1">WhatsApp (ссылка)</label>
+                        <input id="wa-link" required placeholder="https://wa.me/..." class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3] transition">
                     </div>
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-white/70 mb-1">Описание</label>
-                    <textarea id="desc" required rows="3" placeholder="Опишите правила и условия..." class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3] transition"></textarea>
+                    <textarea id="desc" required rows="2" placeholder="Условия и правила..." class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3] transition"></textarea>
                 </div>
                 <button type="submit" class="w-full bg-[#0071e3] hover:bg-[#0077ed] text-white py-3 rounded-xl font-medium text-sm transition mt-2">
-                    Опубликовать состязание
+                    Опубликовать
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-6 right-6 z-50 glass-modal px-6 py-4 rounded-2xl border border-white/20 text-sm flex items-center gap-3 hidden shadow-2xl">
-        <div class="w-6 h-6 rounded-full bg-[#34c759]/20 text-[#34c759] flex items-center justify-center font-bold text-xs" id="toast-icon">✓</div>
-        <span id="toast-text">Успешно!</span>
+    <!-- Уведомления -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 glass-modal px-5 py-3 rounded-2xl border border-white/20 text-xs sm:text-sm flex items-center gap-3 hidden shadow-2xl">
+        <span id="toast-text" class="text-white"></span>
     </div>
 
     <footer class="border-t border-white/10 py-8 text-center text-xs text-white/30">
-        <p>© 2026 izde network. Защищено AI-верификацией для частных школ Казахстана.</p>
+        <p>© 2026 izde network</p>
     </footer>
 
     <script>
@@ -250,7 +278,7 @@
             document.getElementById('auth-user-controls').classList.remove('hidden');
             document.getElementById('auth-user-controls').classList.add('flex');
             
-            document.getElementById('user-display').innerText = `${user.email} (${role === 'teacher' ? 'Верифицированный Учитель' : 'Ученик'})`;
+            document.getElementById('user-display').innerText = `${user.email} (${role === 'teacher' ? 'Учитель' : 'Ученик'})`;
 
             if (role === 'teacher') {
                 const btnCreate = document.getElementById('btn-create-contest');
@@ -262,49 +290,48 @@
         function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
-        function showToast(message, isError = false) {
+        function goHome() {
+            document.getElementById('view-details').classList.add('hidden');
+            document.getElementById('view-home').classList.remove('hidden');
+        }
+
+        function openDetails(title, date, desc, org, tg, wa) {
+            document.getElementById('view-home').classList.add('hidden');
+            document.getElementById('view-details').classList.remove('hidden');
+
+            document.getElementById('det-title').innerText = title;
+            document.getElementById('det-date').innerText = date;
+            document.getElementById('det-desc').innerText = desc;
+            document.getElementById('det-org').innerText = org;
+            document.getElementById('det-tg').href = tg;
+            document.getElementById('det-wa').href = wa;
+            document.getElementById('det-register-btn').setAttribute('onclick', `registerContest('${title}')`);
+        }
+
+        function showToast(message) {
             const toast = document.getElementById('toast');
             document.getElementById('toast-text').innerText = message;
-            const icon = document.getElementById('toast-icon');
-            if (isError) {
-                icon.className = 'w-6 h-6 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center font-bold text-xs';
-                icon.innerText = '✕';
-            } else {
-                icon.className = 'w-6 h-6 rounded-full bg-[#34c759]/20 text-[#34c759] flex items-center justify-center font-bold text-xs';
-                icon.innerText = '✓';
-            }
             toast.classList.remove('hidden');
-            setTimeout(() => toast.classList.add('hidden'), 4000);
+            setTimeout(() => toast.classList.add('hidden'), 3500);
         }
 
         function switchAuthTab(mode) {
             authMode = mode;
             const tabLogin = document.getElementById('tab-login');
             const tabSignup = document.getElementById('tab-signup');
+            const roleSelector = document.getElementById('role-selector');
             const submitBtn = document.getElementById('auth-submit-btn');
 
             if (mode === 'signup') {
-                tabSignup.className = 'text-lg font-bold text-white border-b-2 border-[#0071e3] pb-1';
-                tabLogin.className = 'text-lg font-bold text-white/40 hover:text-white pb-1';
+                tabSignup.className = 'text-base font-bold text-white border-b-2 border-[#0071e3] pb-1';
+                tabLogin.className = 'text-base font-bold text-white/40 hover:text-white pb-1';
+                roleSelector.classList.remove('hidden');
                 submitBtn.innerText = 'Зарегистрироваться';
-                toggleTeacherVerification();
             } else {
-                tabLogin.className = 'text-lg font-bold text-white border-b-2 border-[#0071e3] pb-1';
-                tabSignup.className = 'text-lg font-bold text-white/40 hover:text-white pb-1';
-                document.getElementById('teacher-verification-box').classList.add('hidden');
+                tabLogin.className = 'text-base font-bold text-white border-b-2 border-[#0071e3] pb-1';
+                tabSignup.className = 'text-base font-bold text-white/40 hover:text-white pb-1';
+                roleSelector.classList.add('hidden');
                 submitBtn.innerText = 'Войти';
-            }
-        }
-
-        function toggleTeacherVerification() {
-            if (authMode === 'signup') {
-                const role = document.getElementById('auth-role').value;
-                const box = document.getElementById('teacher-verification-box');
-                if (role === 'teacher') {
-                    box.classList.remove('hidden');
-                } else {
-                    box.classList.add('hidden');
-                }
             }
         }
 
@@ -316,34 +343,23 @@
 
             try {
                 if (authMode === 'signup') {
-                    if (role === 'teacher') {
-                        const fileInput = document.getElementById('teacher-doc');
-                        if (!fileInput.files || fileInput.files.length === 0) {
-                            showToast('AI-проверка: Загрузите документ или справку учителя!', true);
-                            return;
-                        }
-                        // Имитация работы AI-анализа документа (проверка подлинности)
-                        showToast('AI сканирует документ и проверяет статус учителя...');
-                        await new Promise(resolve => setTimeout(resolve, 2000));
-                    }
-
                     const { data, error } = await supabaseClient.auth.signUp({
                         email,
                         password,
                         options: { data: { role: role } }
                     });
                     if (error) throw error;
-                    showToast('Регистрация и AI-верификация успешна!');
+                    showToast('Регистрация прошла успешно.');
                     if (data.user) setUserSession(data.user);
                 } else {
                     const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
                     if (error) throw error;
-                    showToast('С возвращением!');
+                    showToast('Вход выполнен.');
                     if (data.user) setUserSession(data.user);
                 }
                 closeModal('modal-auth');
             } catch (err) {
-                showToast('Ошибка: ' + err.message, true);
+                showToast('Ошибка: ' + err.message);
             }
         }
 
@@ -355,21 +371,21 @@
         function registerContest(name) {
             if (!currentUser) {
                 openModal('modal-auth');
-                showToast('Сначала войдите в систему!', true);
+                showToast('Сначала войдите в систему.');
                 return;
             }
-            showToast(`Вы успешно записались на "${name}"!`);
+            showToast(`Вы записались на событие: ${name}`);
         }
 
         function filterCategory(type, btn) {
             document.querySelectorAll('.filter-btn').forEach(b => {
-                b.className = 'filter-btn px-3 py-1.5 rounded-full text-white/60 hover:text-white transition';
+                b.className = 'filter-btn px-4 py-1.5 rounded-full text-white/60 hover:text-white transition';
             });
-            btn.className = 'filter-btn px-3 py-1.5 rounded-full bg-[#0071e3] text-white font-medium';
+            btn.className = 'filter-btn px-4 py-1.5 rounded-full bg-[#0071e3] text-white font-medium';
 
             const cards = document.querySelectorAll('.contest-card');
             cards.forEach(card => {
-                card.style.display = (type === 'all' || card.dataset.type === type) ? 'block' : 'none';
+                card.style.display = (type === 'all' || card.dataset.type === type) ? 'flex' : 'none';
             });
         }
 
@@ -377,25 +393,38 @@
             e.preventDefault();
             const title = document.getElementById('title').value;
             const type = document.getElementById('type').value;
-            const subject = document.getElementById('subject').value;
+            const datetime = document.getElementById('datetime').value;
+            const tg = document.getElementById('tg-link').value;
+            const wa = document.getElementById('wa-link').value;
             const desc = document.getElementById('desc').value;
 
             const badgeColor = type === 'olympiad' ? 'bg-[#0071e3]/10 text-[#2997ff] border-[#0071e3]/20' : 'bg-[#bf5af2]/10 text-[#bf5af2] border-[#bf5af2]/20';
-            const badgeText = type === 'olympiad' ? subject : `Хакатон / ${subject}`;
+            const badgeText = type === 'olympiad' ? 'Олимпиада' : 'Хакатон';
 
             const newCardHTML = `
-                <div class="contest-card glass p-8 rounded-3xl hover:border-white/20 transition group relative overflow-hidden" data-type="${type}">
-                    <div class="flex justify-between items-start mb-6">
-                        <span class="px-3 py-1 rounded-full ${badgeColor} border text-xs font-medium">${badgeText}</span>
-                        <span class="text-xs text-white/40 font-mono">Скоро • 60 мин</span>
+                <div class="contest-card glass p-6 sm:p-8 rounded-3xl hover:border-white/20 transition group relative flex flex-col justify-between" data-type="${type}">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="px-3 py-1 rounded-full ${badgeColor} border text-xs font-medium">${badgeText}</span>
+                            <span class="text-xs text-white/40 font-mono">${datetime}</span>
+                        </div>
+                        <h3 class="text-lg sm:text-xl font-semibold mb-2 text-white">${title}</h3>
+                        <p class="text-xs sm:text-sm text-white/50 font-light mb-6">${desc}</p>
                     </div>
-                    <h3 class="text-xl font-semibold mb-2 group-hover:text-[#2997ff] transition">${title}</h3>
-                    <p class="text-sm text-white/50 font-light mb-6">${desc}</p>
-                    <div class="flex items-center justify-between pt-4 border-t border-white/5 text-xs text-white/40">
-                        <span>Организатор: Вы (Verified)</span>
-                        <button onclick="registerContest('${title}')" class="text-white font-medium hover:underline flex items-center gap-1">
-                            Записаться &rarr;
-                        </button>
+
+                    <div>
+                        <div class="flex items-center justify-between pt-4 border-t border-white/5 text-xs text-white/40 mb-4">
+                            <span>Вы (Организатор)</span>
+                            <div class="flex gap-2">
+                                <a href="${tg}" target="_blank" class="px-2.5 py-1 rounded-lg bg-[#0071e3]/10 text-[#2997ff] hover:bg-[#0071e3]/20 transition">Telegram</a>
+                                <a href="${wa}" target="_blank" class="px-2.5 py-1 rounded-lg bg-[#34c759]/10 text-[#34c759] hover:bg-[#34c759]/20 transition">WhatsApp</a>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between gap-3">
+                            <button onclick="openDetails('${title}', '${datetime}', '${desc}', 'Вы (Организатор)', '${tg}', '${wa}')" class="text-xs text-white/60 hover:text-white underline">Подробнее</button>
+                            <button onclick="registerContest('${title}')" class="bg-white/10 hover:bg-[#0071e3] text-white px-4 py-2 rounded-xl text-xs font-medium transition">Записаться</button>
+                        </div>
                     </div>
                 </div>
             `;
@@ -403,10 +432,7 @@
             document.getElementById('cards-container').insertAdjacentHTML('afterbegin', newCardHTML);
             closeModal('modal-contest');
             document.getElementById('create-form').reset();
-            showToast('Состязание успешно опубликовано!');
-
-            const countEl = document.getElementById('stat-count');
-            countEl.innerText = parseInt(countEl.innerText) + 1;
+            showToast('Событие опубликовано.');
         }
     </script>
 </body>
