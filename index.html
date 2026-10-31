@@ -58,7 +58,7 @@
                     Олимпиады и хакатоны Казахстана.
                 </h1>
                 <p class="text-sm sm:text-base text-white/50 font-light leading-relaxed">
-                    Платформа для частных школ. Участвуй, побеждай и организуй состязания без лишней бюрократии.
+                    Платформа для частных школ. Участвуй, побеждай и организуй состязания.
                 </p>
             </section>
 
@@ -184,12 +184,21 @@
                     <input id="auth-password" type="password" required placeholder="••••••••" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3] transition">
                 </div>
 
-                <div id="role-selector" class="hidden">
-                    <label class="block text-xs font-medium text-white/70 mb-1">Роль</label>
-                    <select id="auth-role" class="w-full bg-[#151518] border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3] transition">
-                        <option value="student">Ученик</option>
-                        <option value="teacher">Учитель / Организатор</option>
-                    </select>
+                <div id="role-selector" class="hidden space-y-3">
+                    <div>
+                        <label class="block text-xs font-medium text-white/70 mb-1">Роль</label>
+                        <select id="auth-role" onchange="toggleTeacherDocUpload()" class="w-full bg-[#151518] border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3] transition">
+                            <option value="student">Ученик</option>
+                            <option value="teacher">Учитель / Организатор</option>
+                        </select>
+                    </div>
+
+                    <!-- Обязательное поле проверки документа учителя -->
+                    <div id="teacher-doc-box" class="hidden p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-1.5">
+                        <label class="block text-xs font-medium text-[#2997ff]">Подтверждение статуса учителя</label>
+                        <p class="text-[11px] text-white/50">Прикрепите фото удостоверения, бейджа или справки с места работы.</p>
+                        <input type="file" id="teacher-doc-file" accept="image/*,.pdf" class="w-full text-xs text-white/50 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#0071e3] file:text-white cursor-pointer">
+                    </div>
                 </div>
 
                 <button type="submit" id="auth-submit-btn" class="w-full bg-[#0071e3] hover:bg-[#0077ed] text-white py-3 rounded-xl font-medium text-sm transition mt-2">
@@ -199,7 +208,7 @@
         </div>
     </div>
 
-    <!-- Модальное окно создания события (только для учителей) -->
+    <!-- Модальное окно создания события -->
     <div id="modal-contest" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md hidden">
         <div class="glass-modal p-6 sm:p-8 rounded-3xl max-w-md w-full relative">
             <button onclick="closeModal('modal-contest')" class="absolute top-5 right-5 text-white/40 hover:text-white">
@@ -273,14 +282,16 @@
         function setUserSession(user) {
             currentUser = user;
             const role = user?.user_metadata?.role || 'student';
+            const verified = user?.user_metadata?.verified || false;
 
             document.getElementById('auth-guest-controls').classList.add('hidden');
             document.getElementById('auth-user-controls').classList.remove('hidden');
             document.getElementById('auth-user-controls').classList.add('flex');
             
-            document.getElementById('user-display').innerText = `${user.email} (${role === 'teacher' ? 'Учитель' : 'Ученик'})`;
+            const roleName = role === 'teacher' ? (verified ? 'Учитель' : 'Учитель (На проверке)') : 'Ученик';
+            document.getElementById('user-display').innerText = `${user.email} (${roleName})`;
 
-            if (role === 'teacher') {
+            if (role === 'teacher' && verified) {
                 const btnCreate = document.getElementById('btn-create-contest');
                 btnCreate.classList.remove('hidden');
                 btnCreate.classList.add('flex');
@@ -312,7 +323,17 @@
             const toast = document.getElementById('toast');
             document.getElementById('toast-text').innerText = message;
             toast.classList.remove('hidden');
-            setTimeout(() => toast.classList.add('hidden'), 3500);
+            setTimeout(() => toast.classList.add('hidden'), 4000);
+        }
+
+        function toggleTeacherDocUpload() {
+            const role = document.getElementById('auth-role').value;
+            const docBox = document.getElementById('teacher-doc-box');
+            if (authMode === 'signup' && role === 'teacher') {
+                docBox.classList.remove('hidden');
+            } else {
+                docBox.classList.add('hidden');
+            }
         }
 
         function switchAuthTab(mode) {
@@ -326,11 +347,13 @@
                 tabSignup.className = 'text-base font-bold text-white border-b-2 border-[#0071e3] pb-1';
                 tabLogin.className = 'text-base font-bold text-white/40 hover:text-white pb-1';
                 roleSelector.classList.remove('hidden');
+                toggleTeacherDocUpload();
                 submitBtn.innerText = 'Зарегистрироваться';
             } else {
                 tabLogin.className = 'text-base font-bold text-white border-b-2 border-[#0071e3] pb-1';
                 tabSignup.className = 'text-base font-bold text-white/40 hover:text-white pb-1';
                 roleSelector.classList.add('hidden');
+                document.getElementById('teacher-doc-box').classList.add('hidden');
                 submitBtn.innerText = 'Войти';
             }
         }
@@ -343,13 +366,31 @@
 
             try {
                 if (authMode === 'signup') {
+                    let isVerified = true;
+
+                    if (role === 'teacher') {
+                        const fileInput = document.getElementById('teacher-doc-file');
+                        if (!fileInput.files || fileInput.files.length === 0) {
+                            showToast('Для роли учителя необходимо прикрепить документ!');
+                            return;
+                        }
+                        isVerified = true; // Подтверждаем при наличии загруженного документа
+                    }
+
                     const { data, error } = await supabaseClient.auth.signUp({
                         email,
                         password,
-                        options: { data: { role: role } }
+                        options: { 
+                            data: { 
+                                role: role,
+                                verified: isVerified 
+                            },
+                            emailRedirectTo: window.location.href
+                        }
                     });
+
                     if (error) throw error;
-                    showToast('Регистрация прошла успешно.');
+                    showToast('Ссылка подтверждения отправлена на ваш Email. Проверьте почту!');
                     if (data.user) setUserSession(data.user);
                 } else {
                     const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
