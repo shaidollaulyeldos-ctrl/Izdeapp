@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>izde-contest — Панель учителя</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+
+    <!-- Навигация -->
+    <nav class="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <span class="text-xl font-bold tracking-tight text-white">izde-contest</span>
+            <span class="text-xs bg-indigo-900/60 text-indigo-300 border border-indigo-700/50 px-2 py-0.5 rounded-full">Муғалім кабинеті</span>
+        </div>
+        <button onclick="handleLogout()" class="text-xs font-medium text-slate-400 hover:text-white transition">
+            Шығу (Выйти)
+        </button>
+    </nav>
+
+    <div class="max-w-5xl mx-auto p-6 space-y-8">
+        
+        <!-- Заголовок -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-white">Олимпиадалар мен стартаптарды басқару</h1>
+                <p class="text-sm text-slate-400 mt-1">Жаңа жоба жариялаңыз немесе бұрыннан барларын бақылаңыз</p>
+            </div>
+            <button onclick="toggleModal(true)" class="py-2.5 px-5 bg-indigo-600 hover:bg-indigo-500 font-medium text-sm rounded-xl transition shadow-lg shadow-indigo-600/20">
+                + Жаңа жоба қосу
+            </button>
+        </div>
+
+        <!-- Список опубликованных олимпиад и стартапов -->
+        <div class="space-y-4">
+            <h2 class="text-lg font-semibold text-slate-300">Сіздің жарияланымдарыңыз</h2>
+            <div id="contests-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <p id="loading-text" class="text-sm text-slate-500 col-span-2">Жүктелуде...</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Модальное окно создания нового конкурса/олимпиады -->
+    <div id="create-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-lg font-bold text-white">Жаңа конкурс / олимпиада қосу</h3>
+                <button onclick="toggleModal(false)" class="text-slate-400 hover:text-white text-lg">&times;</button>
+            </div>
+
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 uppercase mb-1">Атауы (Название)</label>
+                    <input type="text" id="title" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl focus:outline-none focus:border-indigo-500 text-sm" placeholder="Мысалы: Республикалық робототехника конкурсы">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 uppercase mb-1">Категория</label>
+                        <select id="category" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl focus:outline-none focus:border-indigo-500 text-sm">
+                            <option value="olympiad">Олимпиада</option>
+                            <option value="startup">Стартап</option>
+                            <option value="project">Ғылыми жоба</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 uppercase mb-1">Пән (Предмет)</label>
+                        <input type="text" id="subject" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl focus:outline-none focus:border-indigo-500 text-sm" placeholder="Информатика, Физика...">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 uppercase mb-1">Дедлайн (Соңғы мерзім)</label>
+                    <input type="date" id="deadline" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl focus:outline-none focus:border-indigo-500 text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 uppercase mb-1">Сипаттамасы (Описание)</label>
+                    <textarea id="description" rows="4" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl focus:outline-none focus:border-indigo-500 text-sm" placeholder="Конкурс шарттары мен талаптары..."></textarea>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-3 pt-2">
+                <button onclick="toggleModal(false)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-sm rounded-xl font-medium transition">
+                    Бас тарту
+                </button>
+                <button onclick="createContest()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-sm rounded-xl font-medium transition">
+                    Жариялау
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Инициализация Supabase
+        const SUPABASE_URL = 'https://jmiknovgrcpmlbjryckf.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'; // Твой anon key
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Открытие / закрытие модального окна
+        function toggleModal(show) {
+            const modal = document.getElementById('create-modal');
+            if (show) modal.classList.remove('hidden');
+            else modal.classList.add('hidden');
+        }
+
+        // Загрузка списка конкурсов
+        async function loadContests() {
+            const user = (await supabaseClient.auth.getUser()).data.user;
+            const container = document.getElementById('contests-list');
+
+            const { data: contests, error } = await supabaseClient
+                .from('contests')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error || !contests || contests.length === 0) {
+                container.innerHTML = '<p class="text-sm text-slate-500 col-span-2">Әлі ешқандай жоба жарияланбаған.</p>';
+                return;
+            }
+
+            container.innerHTML = contests.map(c => `
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs uppercase tracking-wider font-semibold px-2.5 py-1 rounded-md ${
+                            c.category === 'olympiad' ? 'bg-amber-950 text-amber-400 border border-amber-800/50' : 
+                            c.category === 'startup' ? 'bg-emerald-950 text-emerald-400 border border-emerald-800/50' : 
+                            'bg-sky-950 text-sky-400 border border-sky-800/50'
+                        }">
+                            ${c.category}
+                        </span>
+                        <span class="text-xs text-slate-400">${c.subject || 'Жалпы'}</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-white">${c.title}</h3>
+                    <p class="text-xs text-slate-400 line-clamp-2">${c.description}</p>
+                    <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-500">
+                        <span>Мерзімі: ${c.deadline ? new Date(c.deadline).toLocaleDateString('kk-KZ') : 'Көрсетілмеген'}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Публикация нового конкурса
+        async function createContest() {
+            const title = document.getElementById('title').value.trim();
+            const category = document.getElementById('category').value;
+            const subject = document.getElementById('subject').value.trim();
+            const deadline = document.getElementById('deadline').value;
+            const description = document.getElementById('description').value.trim();
+
+            const user = (await supabaseClient.auth.getUser()).data.user;
+            if (!user) {
+                alert('Жүйеге кіріңіз!');
+                return;
+            }
+
+            if (!title || !description) {
+                alert(' Барлық өрістерді толтырыңыз!');
+                return;
+            }
+
+            const { error } = await supabaseClient.from('contests').insert([{
+                teacher_id: user.id,
+                title,
+                category,
+                subject,
+                deadline: deadline || null,
+                description
+            }]);
+
+            if (error) {
+                alert('Қате пайда болды: ' + error.message);
+                return;
+            }
+
+            toggleModal(false);
+            loadContests();
+        }
+
+        async function handleLogout() {
+            await supabaseClient.auth.signOut();
+            window.location.href = 'index.html';
+        }
+
+        // Загружаем данные при старте
+        loadContests();
+    </script>
+</body>
+</html>
