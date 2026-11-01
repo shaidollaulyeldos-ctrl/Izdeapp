@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>izde-contest — Олимпиадалар мен стартаптар лентасы</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+
+    <!-- Навигация -->
+    <nav class="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <span class="text-xl font-bold tracking-tight text-white">izde-contest</span>
+            <span class="text-xs bg-sky-900/60 text-sky-300 border border-sky-700/50 px-2 py-0.5 rounded-full">Оқушы лентасы</span>
+        </div>
+        <button onclick="handleLogout()" class="text-xs font-medium text-slate-400 hover:text-white transition">
+            Шығу (Выйти)
+        </button>
+    </nav>
+
+    <div class="max-w-5xl mx-auto p-6 space-y-6">
+        
+        <!-- Заголовок и фильтры -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-white">Барлық олимпиадалар мен стартаптар</h1>
+                <p class="text-sm text-slate-400 mt-1">Өзіңізге ұнаған жобаны таңдап, қатысуға өтінім беріңіз</p>
+            </div>
+        </div>
+
+        <!-- Контейнер для списка конкурсов -->
+        <div id="public-contests-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <p class="text-sm text-slate-500 col-span-2">Жүктелуде...</p>
+        </div>
+
+    </div>
+
+    <script>
+        // Инициализация Supabase
+        const SUPABASE_URL = 'https://jmiknovgrcpmlbjryckf.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'; // Твой anon key
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Загрузка всех конкурсов для ленты
+        async function loadPublicContests() {
+            const container = document.getElementById('public-contests-list');
+
+            const { data: contests, error } = await supabaseClient
+                .from('contests')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error || !contests || contests.length === 0) {
+                container.innerHTML = '<p class="text-sm text-slate-500 col-span-2">Әлі ешқандай жоба жарияланбаған.</p>';
+                return;
+            }
+
+            container.innerHTML = contests.map(c => `
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4 flex flex-col justify-between">
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs uppercase tracking-wider font-semibold px-2.5 py-1 rounded-md ${
+                                c.category === 'olympiad' ? 'bg-amber-950 text-amber-400 border border-amber-800/50' : 
+                                c.category === 'startup' ? 'bg-emerald-950 text-emerald-400 border border-emerald-800/50' : 
+                                'bg-sky-950 text-sky-400 border border-sky-800/50'
+                            }">
+                                ${c.category}
+                            </span>
+                            <span class="text-xs text-slate-400">${c.subject || 'Жалпы'}</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white">${c.title}</h3>
+                        <p class="text-xs text-slate-400 leading-relaxed">${c.description}</p>
+                    </div>
+
+                    <div class="pt-4 border-t border-slate-800/80 flex items-center justify-between">
+                        <span class="text-xs text-slate-500">Мерзімі: ${c.deadline ? new Date(c.deadline).toLocaleDateString('kk-KZ') : 'Көрсетілмеген'}</span>
+                        <button onclick="applyToContest('${c.id}')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-xs font-medium rounded-xl transition">
+                            Қатысуға өтінім беру
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Функция подачи заявки школьником
+        async function applyToContest(contestId) {
+            const user = (await supabaseClient.auth.getUser()).data.user;
+            if (!user) {
+                alert('Өтінім беру үшін жүйеге кіріңіз!');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const { error } = await supabaseClient.from('applications').insert([{
+                contest_id: contestId,
+                student_id: user.id,
+                status: 'pending'
+            }]);
+
+            if (error) {
+                if (error.code === '23505') {
+                    alert('Сіз бұл конкурсқа бұрын өтінім бергенсіз!');
+                } else {
+                    alert('Қате орын алды: ' + error.message);
+                }
+                return;
+            }
+
+            alert('✅ Өтінім сәтті жіберілді!');
+        }
+
+        async function handleLogout() {
+            await supabaseClient.auth.signOut();
+            window.location.href = 'index.html';
+        }
+
+        loadPublicContests();
+    </script>
+</body>
+</html>
